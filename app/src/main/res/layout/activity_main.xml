@@ -5,12 +5,82 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:layout_margin="16dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아이디 값"
+            android:textSize="20sp"
+            android:layout_marginRight="10dp"/>
+        <EditText
+            android:id="@+id/edtID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvKey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="키 값        "
+            android:textSize="20sp"
+            android:layout_marginRight="10dp"/>
+        <EditText
+            android:id="@+id/edtKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="밸류 값    "
+            android:textSize="20sp"
+            android:layout_marginEnd="10dp"/>
+        <EditText
+            android:id="@+id/edtValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnPush"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="입력하기"/>
+        <Button
+            android:id="@+id/btnRead"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="읽어오기"/>
+
+    </LinearLayout>
     <TextView
-        android:id="@+id/tvText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:id="@+id/tvResult"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="20sp"/>
 
 </LinearLayout>
