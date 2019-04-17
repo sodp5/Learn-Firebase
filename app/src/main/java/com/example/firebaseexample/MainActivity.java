@@ -10,27 +10,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     private TextView tvID, tvKey, tvValue;
     private EditText edtID, edtKey, edtValue;
-    private Button btnPush, btnRead, btnCreateId;
+    private Button btnPush, btnRead, btnCreateId, btnLogin, btnLogOut;
 
     private String myKey;
+    private boolean isLogin;
 
     private DatabaseReference databaseReference;
+
+    private HashMap<String, String> memberListMap;
+
+    private final static String MEMBER_LIST = "MemberList";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         initView();
         addButtonEvent();
         initInstance();
+        setChildMap(memberListMap, MEMBER_LIST);
 
     }
 
@@ -55,44 +56,44 @@ public class MainActivity extends AppCompatActivity {
         btnPush = findViewById(R.id.btnPush);
         btnRead = findViewById(R.id.btnRead);
         btnCreateId = findViewById(R.id.btnCreateId);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnLogOut = findViewById(R.id.btnLogOut);
     }
 
     private void initInstance() {
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        memberListMap = new HashMap<>();
     }
 
     private void addButtonEvent() {
         btnPush.setOnClickListener(btnPushClickEvent);
         btnRead.setOnClickListener(btnReadClickEvent);
         btnCreateId.setOnClickListener(btnCreateIdClickEvent);
+        btnLogin.setOnClickListener(btnLoginClickEvent);
+        btnLogOut.setOnClickListener(btnLogOutClickEvent);
     }
 
     private View.OnClickListener btnCreateIdClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            databaseReference.child("MemberList").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        Log.d("키값", ds.getKey());
-                        Log.d("밸류값", ds.getValue() + "");
-//                        if(ds.getKey().equals("1"))
-//                            break;
-                    }
-                }
+            String myId = edtID.getText().toString();
+            setChildMap(memberListMap, MEMBER_LIST);
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            if (isExistId(myId))
+                Toast.makeText(MainActivity.this, "이미 존재하는 ID 입니다!", Toast.LENGTH_SHORT).show();
+            else if (myId.length() <= 0) {
+                Toast.makeText(MainActivity.this, "ID를 입력 해 주세요!", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                databaseReference.child(MEMBER_LIST).child(myId).setValue("password");
+            }
         }
     };
 
     private View.OnClickListener btnPushClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            databaseReference = FirebaseDatabase.getInstance().getReference(edtID.getText().toString());
+
         }
     };
 
@@ -102,5 +103,67 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private View.OnClickListener btnLoginClickEvent = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            String id = edtID.getText().toString();
+
+            if (id.length() <= 0) {
+                Toast.makeText(MainActivity.this, "ID를 입력 해주세요!!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isLogin) {
+                // 패스워드도 일치하는지 체크하는 코드가 생겨야 할 것
+                if (isExistId(id)) {
+                    isLogin = true;
+                    myKey = id;
+                    Toast.makeText(MainActivity.this, "로그인 되셨습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(MainActivity.this, "존재하지 않는 ID 입니다!", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "이미 로그인 중입니다!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    private View.OnClickListener btnLogOutClickEvent = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (isLogin) {
+                isLogin = false;
+                Toast.makeText(MainActivity.this, "로그아웃 되셨습니다.", Toast.LENGTH_SHORT).show();
+            }
+            else
+                Toast.makeText(MainActivity.this, "로그인중이 아닙니다!", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
+    private void setChildMap(final HashMap<String, String> map, String key) {
+        databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    map.put(ds.getKey(), ds.getValue(String.class));
+
+                    Log.d("키값", ds.getKey());
+                    Log.d("밸류값", map.get(ds.getKey()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private boolean isExistId(String id) {
+        return memberListMap.containsKey(id);
+    }
 }
 
