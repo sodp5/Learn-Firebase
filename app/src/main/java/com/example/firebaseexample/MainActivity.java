@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
 
     private HashMap<String, String> memberListMap;
+    private HashMap<String, String> memberDataMap;
 
     private final static String MEMBER_LIST = "MemberList";
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private void initInstance() {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         memberListMap = new HashMap<>();
+        memberDataMap = new HashMap<>();
     }
 
     private void addButtonEvent() {
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             String myId = edtID.getText().toString();
             setChildMap(memberListMap, MEMBER_LIST);
 
+            // password를 묻는 문장도 추가 되어야 할것.
             if (isExistId(myId))
                 Toast.makeText(MainActivity.this, "이미 존재하는 ID 입니다!", Toast.LENGTH_SHORT).show();
             else if (myId.length() <= 0) {
@@ -93,14 +96,30 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener btnPushClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (!isLogin) {
+                Toast.makeText(MainActivity.this, "로그인을 먼저 해주세요!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            if (edtKey.getText().toString().length() <= 0) {
+                Toast.makeText(MainActivity.this, "key를 입력해주세요!!!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (edtValue.getText().toString().length() <= 0) {
+                Toast.makeText(MainActivity.this, "value를 입력해주세요!!!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            databaseReference.child(myKey).child(edtKey.getText().toString()).setValue(edtValue.getText().toString());
+            Toast.makeText(MainActivity.this, "값을 추가했습니다.", Toast.LENGTH_SHORT).show();
         }
     };
 
     private View.OnClickListener btnReadClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
+            setChildMap(memberDataMap, makePathString(MEMBER_LIST, myKey));
         }
     };
 
@@ -119,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 if (isExistId(id)) {
                     isLogin = true;
                     myKey = id;
-                    Toast.makeText(MainActivity.this, "로그인 되셨습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, id + "님 로그인 되셨습니다.", Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(MainActivity.this, "존재하지 않는 ID 입니다!", Toast.LENGTH_SHORT).show();
@@ -160,6 +179,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private String makePathString(String... str) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(str[0]);
+        for (int i = 1; i < str.length; i++) {
+            sb.append("/").append(str[i]);
+        }
+
+        return sb.toString();
     }
 
     private boolean isExistId(String id) {
