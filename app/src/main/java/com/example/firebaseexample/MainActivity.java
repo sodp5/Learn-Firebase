@@ -17,9 +17,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView tvID, tvKey, tvValue;
+    private TextView tvID, tvKey, tvValue, tvResult;
     private EditText edtID, edtKey, edtValue;
     private Button btnPush, btnRead, btnCreateId, btnLogin, btnLogOut;
 
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         initView();
         addButtonEvent();
         initInstance();
-        setChildMap(memberListMap, MEMBER_LIST);
+//        setChildMap(memberListMap, MEMBER_LIST);
 
     }
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         tvID = findViewById(R.id.tvID);
         tvKey = findViewById(R.id.tvKey);
         tvValue = findViewById(R.id.tvValue);
+        tvResult = findViewById(R.id.tvResult);
 
         edtID = findViewById(R.id.edtID);
         edtKey = findViewById(R.id.edtKey);
@@ -119,13 +121,32 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener btnReadClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            setChildMap(memberDataMap, makePathString(MEMBER_LIST, myKey));
+            if (!isLogin) {
+                Toast.makeText(MainActivity.this, "로그인을 먼저 해주세요!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String key = "";
+            String value = "";
+            StringBuilder sb = new StringBuilder();
+            setChildMap(memberDataMap, makePathString(myKey));
+            Iterator<String> iterator = memberDataMap.keySet().iterator();
+
+            while(iterator.hasNext()) {
+                key = iterator.next();
+                value = memberDataMap.get(key);
+
+                sb.append("key : ").append(key).append(", value : ").append(value).append("\n");
+            }
+            Log.d("결과값", sb.toString());
+            tvResult.setText(sb.toString());
         }
     };
 
     private View.OnClickListener btnLoginClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            setChildMap(memberListMap, MEMBER_LIST);
             String id = edtID.getText().toString();
 
             if (id.length() <= 0) {
@@ -189,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
             sb.append("/").append(str[i]);
         }
 
+        Log.d("경로값", sb.toString());
         return sb.toString();
     }
 
