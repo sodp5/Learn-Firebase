@@ -21,10 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private TextView tvID, tvKey, tvValue;
     private EditText edtID, edtKey, edtValue;
-    private Button btnPush, btnRead;
+    private Button btnPush, btnRead, btnCreateId;
 
     private String myKey;
 
@@ -52,21 +54,45 @@ public class MainActivity extends AppCompatActivity {
 
         btnPush = findViewById(R.id.btnPush);
         btnRead = findViewById(R.id.btnRead);
+        btnCreateId = findViewById(R.id.btnCreateId);
     }
 
     private void initInstance() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("");
+        databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     private void addButtonEvent() {
         btnPush.setOnClickListener(btnPushClickEvent);
         btnRead.setOnClickListener(btnReadClickEvent);
+        btnCreateId.setOnClickListener(btnCreateIdClickEvent);
     }
+
+    private View.OnClickListener btnCreateIdClickEvent = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            databaseReference.child("MemberList").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        Log.d("키값", ds.getKey());
+                        Log.d("밸류값", ds.getValue() + "");
+//                        if(ds.getKey().equals("1"))
+//                            break;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    };
 
     private View.OnClickListener btnPushClickEvent = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
+            databaseReference = FirebaseDatabase.getInstance().getReference(edtID.getText().toString());
         }
     };
 
@@ -77,3 +103,4 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 }
+

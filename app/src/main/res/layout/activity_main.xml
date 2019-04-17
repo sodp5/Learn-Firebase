@@ -77,6 +77,11 @@
             android:text="읽어오기"/>
 
     </LinearLayout>
+    <Button
+        android:id="@+id/btnCreateId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="아이디 새로 만들기"/>
     <TextView
         android:id="@+id/tvResult"
         android:layout_width="match_parent"
